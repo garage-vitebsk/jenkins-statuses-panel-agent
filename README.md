@@ -3,6 +3,8 @@ The PC agent to connect to Jenkins and transfer data into Jenkins Statuses Panel
 
 ## Prerequizites ##
 - Install Maven
+- Add plugin for Lombok into your IDE
+- Configure your IDE to support Lombok
 
 ## Build steps ##
 - Download https://github.com/zsmartsystems/com.zsmartsystems.bluetooth.bluegiga
