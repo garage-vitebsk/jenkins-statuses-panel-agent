@@ -8,5 +8,5 @@ import lombok.Data;
 @Data
 public class BuildInformation {
     private String jobName;
-    private String jobStatus;
+    private JobStatus jobStatus;
 }
