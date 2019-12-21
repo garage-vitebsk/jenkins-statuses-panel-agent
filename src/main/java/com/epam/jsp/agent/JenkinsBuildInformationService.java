@@ -3,6 +3,7 @@ package com.epam.jsp.agent;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +44,34 @@ public class JenkinsBuildInformationService implements BuildInformationService {
                 try {
                     String jobName = jobWithDetails.getName();
                     List<Build> builds = jobWithDetails.getAllBuilds(Range.build().from(nextBuildNumber - 1).build());
-                    BuildInformation buildInformation = new BuildInformation();
-                    buildInformation.setJobName(jobName);
-                    buildInformation.setJobStatus(JobStatus.GREEN);
                     buildInformationList = new ArrayList<>(5);
-                    for (int i = 0; i < 5 && i < (nextBuildNumber - 1); i++) {
+                    for (int i = 0; i < 5; i++) {
+                        BuildInformation buildInformation = new BuildInformation();
+                        buildInformation.setJobName(jobName);
+                        if (i < builds.size()) {
+                            Build build = builds.get(i);
+                            if (null != build) {
+                                BuildWithDetails buildWithDetails = build.details();
+                                switch (buildWithDetails.getResult()) {
+                                    case SUCCESS:
+                                        buildInformation.setJobStatus(JobStatus.GREEN);
+                                        break;
+                                    case FAILURE:
+                                        buildInformation.setJobStatus(JobStatus.RED);
+                                        break;
+                                    case UNSTABLE:
+                                        buildInformation.setJobStatus(JobStatus.YELLOW);
+                                        break;
+                                    default:
+                                        buildInformation.setJobStatus(JobStatus.BLACK);
+                                        break;
+                                }
+                            } else {
+                                LOGGER.warn("No build information by some reason.");
+                            }
+                        } else {
+                            buildInformation.setJobStatus(JobStatus.BLACK);
+                        }
                         buildInformationList.add(buildInformation);
                     }
                 } catch (IOException e) {

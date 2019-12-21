@@ -3,6 +3,8 @@ package com.epam.jsp.agent;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.helper.Range;
 import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildResult;
+import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.validateMockitoUsage;
@@ -35,8 +36,13 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
-        when(mockJobWithDetails.getAllBuilds(argThat(t -> "{1,}".equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(
+                        t -> (Range.CURLY_BRACKET_OPEN + "1," + Range.CURLY_BRACKET_CLOSE)
+                                .equals(t.getRangeString()))))
                 .thenReturn(Collections.singletonList(mockBuild));
+        BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
+        when(mockBuild.details()).thenReturn(mockBuildWithDetails);
+        when(mockBuildWithDetails.getResult()).thenReturn(BuildResult.SUCCESS);
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
@@ -46,9 +52,13 @@ public class JenkinsBuildInformationServiceTest {
         verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(any(Range.class));
+        verify(mockJobWithDetails).getAllBuilds(argThat(
+                t -> (Range.CURLY_BRACKET_OPEN + "1," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockBuild).details();
+        verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();
         assertNotNull(buildInformationList);
+        assertEquals(5, buildInformationList.size());
         assertTrue(buildInformationList.contains(expectedBuildInformation));
     }
 
