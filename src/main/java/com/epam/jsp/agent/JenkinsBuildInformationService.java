@@ -43,34 +43,32 @@ public class JenkinsBuildInformationService implements BuildInformationService {
             if (nextBuildNumber > 1) {
                 try {
                     String jobName = jobWithDetails.getName();
-                    List<Build> builds = jobWithDetails.getAllBuilds(Range.build().from(nextBuildNumber - 1).build());
-                    buildInformationList = new ArrayList<>(5);
-                    for (int i = 0; i < 5; i++) {
+                    int startIndex = nextBuildNumber > 6 ? nextBuildNumber - 6 : 0;
+                    List<Build> builds = jobWithDetails.getAllBuilds(Range.build().from(startIndex).build());
+                    int countBuilds = (6 < nextBuildNumber) ? 5 : nextBuildNumber - 1;
+                    buildInformationList = new ArrayList<>(countBuilds);
+                    for (int i = 0; (i < 5 && i < countBuilds); i++) {
                         BuildInformation buildInformation = new BuildInformation();
                         buildInformation.setJobName(jobName);
-                        if (i < builds.size()) {
-                            Build build = builds.get(i);
-                            if (null != build) {
-                                BuildWithDetails buildWithDetails = build.details();
-                                switch (buildWithDetails.getResult()) {
-                                    case SUCCESS:
-                                        buildInformation.setJobStatus(JobStatus.GREEN);
-                                        break;
-                                    case FAILURE:
-                                        buildInformation.setJobStatus(JobStatus.RED);
-                                        break;
-                                    case UNSTABLE:
-                                        buildInformation.setJobStatus(JobStatus.YELLOW);
-                                        break;
-                                    default:
-                                        buildInformation.setJobStatus(JobStatus.BLACK);
-                                        break;
-                                }
-                            } else {
-                                LOGGER.warn("No build information by some reason.");
+                        Build build = builds.get(i);
+                        if (null != build) {
+                            BuildWithDetails buildWithDetails = build.details();
+                            switch (buildWithDetails.getResult()) {
+                                case SUCCESS:
+                                    buildInformation.setJobStatus(JobStatus.GREEN);
+                                    break;
+                                case FAILURE:
+                                    buildInformation.setJobStatus(JobStatus.RED);
+                                    break;
+                                case UNSTABLE:
+                                    buildInformation.setJobStatus(JobStatus.YELLOW);
+                                    break;
+                                default:
+                                    buildInformation.setJobStatus(JobStatus.BLACK);
+                                    break;
                             }
                         } else {
-                            buildInformation.setJobStatus(JobStatus.BLACK);
+                            LOGGER.warn("No build information by some reason.");
                         }
                         buildInformationList.add(buildInformation);
                     }
