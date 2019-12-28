@@ -1,7 +1,7 @@
 # jenkins-statuses-panel-agent
 The PC agent to connect to Jenkins and transfer data into Jenkins Statuses Panel
 
-## Prerequizites ##
+## Prerequisites ##
 - Install Maven
 - Add plugin for Lombok into your IDE
 - Configure your IDE to support Lombok
