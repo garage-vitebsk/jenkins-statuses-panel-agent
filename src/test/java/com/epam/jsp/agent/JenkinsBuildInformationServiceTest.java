@@ -29,14 +29,17 @@ import static org.mockito.Mockito.when;
  */
 public class JenkinsBuildInformationServiceTest {
 
+    public static final String JOB_NAME = "test";
+    public static final String JOB_PATH = "job/test/";
+
     @Test
     void testGetBuildInformation() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
         when(mockJobWithDetails.getName()).thenReturn("TEST");
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
         when(mockJobWithDetails.getAllBuilds(argThat(
@@ -52,7 +55,7 @@ public class JenkinsBuildInformationServiceTest {
         expectedBuildInformation.setJobStatus(JobStatus.GREEN);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
         verify(mockJobWithDetails).getAllBuilds(argThat(
@@ -70,10 +73,10 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationForUnstableJob() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
         when(mockJobWithDetails.getName()).thenReturn("TEST");
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
         when(mockJobWithDetails.getAllBuilds(argThat(
@@ -89,7 +92,7 @@ public class JenkinsBuildInformationServiceTest {
         expectedBuildInformation.setJobStatus(JobStatus.YELLOW);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
         verify(mockJobWithDetails).getAllBuilds(argThat(
@@ -107,10 +110,10 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationForFailedJob() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
         when(mockJobWithDetails.getName()).thenReturn("TEST");
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
         when(mockJobWithDetails.getAllBuilds(argThat(
@@ -126,7 +129,7 @@ public class JenkinsBuildInformationServiceTest {
         expectedBuildInformation.setJobStatus(JobStatus.RED);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
         verify(mockJobWithDetails).getAllBuilds(argThat(
@@ -144,10 +147,10 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationFor4Builds() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
         when(mockJobWithDetails.getName()).thenReturn("TEST");
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(5);
         Build mockBuild = mock(Build.class);
         List<Build> buildList = createExpectedList(mockBuild, 4);
@@ -164,7 +167,7 @@ public class JenkinsBuildInformationServiceTest {
         expectedBuildInformation.setJobStatus(JobStatus.GREEN);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
         verify(mockJobWithDetails).getAllBuilds(argThat(
@@ -202,10 +205,10 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationFor5Builds() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
         when(mockJobWithDetails.getName()).thenReturn("TEST");
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(6);
         Build mockBuild = mock(Build.class);
         List<Build> buildList = createExpectedList(mockBuild, 5);
@@ -222,7 +225,7 @@ public class JenkinsBuildInformationServiceTest {
         expectedBuildInformation.setJobStatus(JobStatus.GREEN);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
         verify(mockJobWithDetails).getAllBuilds(argThat(
@@ -244,10 +247,10 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationFor6Build() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
         when(mockJobWithDetails.getName()).thenReturn("TEST");
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(7);
         Build mockBuild = mock(Build.class);
         List<Build> buildList = createExpectedList(mockBuild, 5);
@@ -264,7 +267,7 @@ public class JenkinsBuildInformationServiceTest {
         expectedBuildInformation.setJobStatus(JobStatus.GREEN);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
         verify(mockJobWithDetails).getAllBuilds(argThat(
@@ -292,9 +295,9 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationNoConnection() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         String exceptionMessage = "Exception from test";
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class))
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class))
                 .thenThrow(new IOException(exceptionMessage));
 
         try {
@@ -304,7 +307,7 @@ public class JenkinsBuildInformationServiceTest {
             assertEquals(exceptionMessage, throwable.getMessage());
         }
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         validateMockitoUsage();
     }
 
@@ -312,14 +315,14 @@ public class JenkinsBuildInformationServiceTest {
     void testGetBuildInformationNoBuilds() throws IOException {
         JenkinsHttpClient mockJenkinsHttpClient = mock(JenkinsHttpClient.class);
         BuildInformationService buildInformationService = new JenkinsBuildInformationService(
-                mockJenkinsHttpClient);
+                mockJenkinsHttpClient, JOB_NAME);
         JobWithDetails mockJobWithDetails = mock(JobWithDetails.class);
-        when(mockJenkinsHttpClient.get("", JobWithDetails.class)).thenReturn(mockJobWithDetails);
+        when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(1);
 
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
-        verify(mockJenkinsHttpClient).get("", JobWithDetails.class);
+        verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         validateMockitoUsage();
         assertNotNull(buildInformationList);

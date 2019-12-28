@@ -19,12 +19,14 @@ import java.util.List;
 public class JenkinsBuildInformationService implements BuildInformationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JenkinsBuildInformationService.class);
+    private final String jobPath;
 
 
     private JenkinsHttpClient jenkinsHttpClient;
 
-    public JenkinsBuildInformationService(JenkinsHttpClient jenkinsHttpClient) {
+    public JenkinsBuildInformationService(JenkinsHttpClient jenkinsHttpClient, String jobName) {
         this.jenkinsHttpClient = jenkinsHttpClient;
+        this.jobPath = "job/" + jobName + "/";
     }
 
     @Override
@@ -32,7 +34,7 @@ public class JenkinsBuildInformationService implements BuildInformationService {
         List<BuildInformation> buildInformationList = Collections.emptyList();
         JobWithDetails jobWithDetails;
         try {
-            jobWithDetails = jenkinsHttpClient.get("", JobWithDetails.class);
+            jobWithDetails = jenkinsHttpClient.get(jobPath, JobWithDetails.class);
         } catch (IOException e) {
             LOGGER.error("Can't process information from server", e);
             throw new RuntimeException(e);
