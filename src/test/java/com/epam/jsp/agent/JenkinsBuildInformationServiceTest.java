@@ -31,6 +31,7 @@ public class JenkinsBuildInformationServiceTest {
 
     public static final String JOB_NAME = "test";
     public static final String JOB_PATH = "job/test/";
+    public static final String RANGE = Range.CURLY_BRACKET_OPEN + ",5" + Range.CURLY_BRACKET_CLOSE;
 
     @Test
     void testGetBuildInformation() throws IOException {
@@ -42,9 +43,7 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
-        when(mockJobWithDetails.getAllBuilds(argThat(
-                        t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE)
-                                .equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString()))))
                 .thenReturn(Collections.singletonList(mockBuild));
         BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
         when(mockBuild.details()).thenReturn(mockBuildWithDetails);
@@ -52,14 +51,13 @@ public class JenkinsBuildInformationServiceTest {
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
-        expectedBuildInformation.setJobStatus(JobStatus.GREEN);
+        expectedBuildInformation.setJobStatus(JobStatus.SUCCESS);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
         verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockJobWithDetails).getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString())));
         verify(mockBuild).details();
         verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();
@@ -79,9 +77,7 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
-        when(mockJobWithDetails.getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE)
-                        .equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString()))))
                 .thenReturn(Collections.singletonList(mockBuild));
         BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
         when(mockBuild.details()).thenReturn(mockBuildWithDetails);
@@ -89,14 +85,13 @@ public class JenkinsBuildInformationServiceTest {
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
-        expectedBuildInformation.setJobStatus(JobStatus.YELLOW);
+        expectedBuildInformation.setJobStatus(JobStatus.WARNING);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
         verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockJobWithDetails).getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString())));
         verify(mockBuild).details();
         verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();
@@ -116,9 +111,7 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJenkinsHttpClient.get(JOB_PATH, JobWithDetails.class)).thenReturn(mockJobWithDetails);
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(2);
         Build mockBuild = mock(Build.class);
-        when(mockJobWithDetails.getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE)
-                        .equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString()))))
                 .thenReturn(Collections.singletonList(mockBuild));
         BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
         when(mockBuild.details()).thenReturn(mockBuildWithDetails);
@@ -126,14 +119,13 @@ public class JenkinsBuildInformationServiceTest {
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
-        expectedBuildInformation.setJobStatus(JobStatus.RED);
+        expectedBuildInformation.setJobStatus(JobStatus.FAILED);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
         verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockJobWithDetails).getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString())));
         verify(mockBuild).details();
         verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();
@@ -154,9 +146,7 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(5);
         Build mockBuild = mock(Build.class);
         List<Build> buildList = createExpectedList(mockBuild, 4);
-        when(mockJobWithDetails.getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE)
-                        .equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString()))))
                 .thenReturn(buildList);
         BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
         when(mockBuild.details()).thenReturn(mockBuildWithDetails);
@@ -164,14 +154,13 @@ public class JenkinsBuildInformationServiceTest {
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
-        expectedBuildInformation.setJobStatus(JobStatus.GREEN);
+        expectedBuildInformation.setJobStatus(JobStatus.SUCCESS);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
         verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockJobWithDetails).getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString())));
         verify(mockBuild).details();
         verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();
@@ -212,9 +201,7 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(6);
         Build mockBuild = mock(Build.class);
         List<Build> buildList = createExpectedList(mockBuild, 5);
-        when(mockJobWithDetails.getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE)
-                        .equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString()))))
                 .thenReturn(buildList);
         BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
         when(mockBuild.details()).thenReturn(mockBuildWithDetails);
@@ -222,14 +209,13 @@ public class JenkinsBuildInformationServiceTest {
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
-        expectedBuildInformation.setJobStatus(JobStatus.GREEN);
+        expectedBuildInformation.setJobStatus(JobStatus.SUCCESS);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
         verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "0," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockJobWithDetails).getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString())));
         verify(mockBuild).details();
         verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();
@@ -254,9 +240,7 @@ public class JenkinsBuildInformationServiceTest {
         when(mockJobWithDetails.getNextBuildNumber()).thenReturn(7);
         Build mockBuild = mock(Build.class);
         List<Build> buildList = createExpectedList(mockBuild, 5);
-        when(mockJobWithDetails.getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "1," + Range.CURLY_BRACKET_CLOSE)
-                        .equals(t.getRangeString()))))
+        when(mockJobWithDetails.getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString()))))
                 .thenReturn(buildList);
         BuildWithDetails mockBuildWithDetails = mock(BuildWithDetails.class);
         when(mockBuild.details()).thenReturn(mockBuildWithDetails);
@@ -264,14 +248,13 @@ public class JenkinsBuildInformationServiceTest {
 
         BuildInformation expectedBuildInformation = new BuildInformation();
         expectedBuildInformation.setJobName("TEST");
-        expectedBuildInformation.setJobStatus(JobStatus.GREEN);
+        expectedBuildInformation.setJobStatus(JobStatus.SUCCESS);
         List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
 
         verify(mockJenkinsHttpClient).get(JOB_PATH, JobWithDetails.class);
         verify(mockJobWithDetails).getNextBuildNumber();
         verify(mockJobWithDetails).getName();
-        verify(mockJobWithDetails).getAllBuilds(argThat(
-                t -> (Range.CURLY_BRACKET_OPEN + "1," + Range.CURLY_BRACKET_CLOSE).equals(t.getRangeString())));
+        verify(mockJobWithDetails).getAllBuilds(argThat(t -> RANGE.equals(t.getRangeString())));
         verify(mockBuild).details();
         verify(mockBuildWithDetails).getResult();
         validateMockitoUsage();

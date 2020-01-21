@@ -1,5 +1,6 @@
 package com.epam.jsp.agent;
 
+import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import org.korecky.bluetooth.client.hc06.entity.RFCommBluetoothDevice;
 import org.korecky.bluetooth.client.hc06.enums.ServiceUUID;
 import org.korecky.bluetooth.client.hc06.event.ErrorEvent;
@@ -21,6 +22,7 @@ import javax.microedition.io.StreamConnection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.LinkedList;
@@ -35,6 +37,7 @@ public class Agent {
     private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);
     private static final AtomicBoolean DEVICES_FOUND = new AtomicBoolean(false);
     private static final AtomicBoolean SERVICES_FOUND = new AtomicBoolean(false);
+    private static final AtomicBoolean IN_PROGRESS_SWITCHER = new AtomicBoolean(false);
 
     public static void main(String[] args) throws InterruptedException, IOException {
         LocalDevice localDevice = LocalDevice.getLocalDevice();
@@ -99,6 +102,9 @@ public class Agent {
         // device will get message from this code
         RFCommBluetoothDevice device = tempDevice;
 
+        JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(URI.create("http://localhost:8080/"));
+        BuildInformationService buildInformationService = new JenkinsBuildInformationService(jenkinsHttpClient, "test-test");
+
         if (device != null) {
             DiscoveryListener serviceDiscoveryListener = new DiscoveryListener() {
                 @Override
@@ -133,7 +139,7 @@ public class Agent {
                     device.getRemoteDevice(), serviceDiscoveryListener);
 
             while (!SERVICES_FOUND.get()) {
-                LOGGER.info("Looking for services!");
+                LOGGER.info("Looking for services for device {}!", device.getName());
                 Thread.sleep(2000L);
             }
 
@@ -147,11 +153,50 @@ public class Agent {
                         try (OutputStream os = connection.openOutputStream()) {
                             //sender string
                             while (true) {
-                                String message = "TEST" + r.ints(5, 0, 3)
-                                        .boxed().map(Object::toString).collect(Collectors.joining(""));
-                                os.write(message.getBytes());
 
-                                Thread.sleep(3000L);
+                                List<BuildInformation> buildInformationList = buildInformationService.getBuildInformation();
+                                if (null != buildInformationList && !buildInformationList.isEmpty()) {
+                                    String jobName = buildInformationList.get(0).getJobName();
+                                    StringBuilder sb = new StringBuilder();
+                                    for (int i = 0; i < buildInformationList.size(); i++) {
+                                        switch (buildInformationList.get(i).getJobStatus()) {
+                                            case SUCCESS:
+                                            case FAILED:
+                                            case WARNING:
+                                            case NO_INFORMATION:
+                                                sb.append(defineColor(buildInformationList.get(i).getJobStatus()));
+                                                break;
+                                            case IN_PROGRESS:
+                                                String sign = "";
+                                                if (IN_PROGRESS_SWITCHER.get()) {
+                                                    if (0 == i) {
+                                                        // if it is the first build - it will blink green color
+                                                        sb.append("1");
+                                                    } else {
+                                                        sb.append(defineColor(buildInformationList.get(i - 1)
+                                                                .getJobStatus()));
+                                                    }
+                                                }
+                                                IN_PROGRESS_SWITCHER.set(!IN_PROGRESS_SWITCHER.get());
+                                            default:
+                                                LOGGER.warn("Unknown enum constant");
+                                                break;
+                                        }
+                                    }
+                                    sb.append('\0'); // the sign that the name is ended
+                                    sb.reverse();
+                                    for (int i = buildInformationList.size(); i < 5; i++) {
+                                        sb.append("0");
+                                    }
+                                    sb.replace(0,0, jobName);
+                                    String message = sb.toString();
+                                    LOGGER.info(message);
+                                    os.write(message.getBytes());
+                                } else {
+                                    LOGGER.info("No information!");
+                                }
+
+                                Thread.sleep(2000L);
                             }
                         } catch (IOException | InterruptedException ex) {
                             LOGGER.error("Cannot send message.", ex);
@@ -163,6 +208,23 @@ public class Agent {
             } catch (IOException e) {
                 LOGGER.error("Cannot to create connection to device", e);
             }
+        }
+    }
+
+    private static String defineColor(JobStatus status) {
+        switch (status) {
+            case SUCCESS:
+                return "1";
+            case FAILED:
+                return "3";
+            case WARNING:
+                return "2";
+            case NO_INFORMATION:
+                return "0";
+            case IN_PROGRESS:
+            default:
+                LOGGER.warn("Unknown enum constant");
+                return "";
         }
     }
 

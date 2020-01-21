@@ -45,8 +45,7 @@ public class JenkinsBuildInformationService implements BuildInformationService {
             if (nextBuildNumber > 1) {
                 try {
                     String jobName = jobWithDetails.getName();
-                    int startIndex = nextBuildNumber > 6 ? nextBuildNumber - 6 : 0;
-                    List<Build> builds = jobWithDetails.getAllBuilds(Range.build().from(startIndex).build());
+                    List<Build> builds = jobWithDetails.getAllBuilds(Range.build().to(5).build());
                     int countBuilds = (6 < nextBuildNumber) ? 5 : nextBuildNumber - 1;
                     buildInformationList = new ArrayList<>(countBuilds);
                     for (int i = 0; (i < 5 && i < countBuilds); i++) {
@@ -57,16 +56,24 @@ public class JenkinsBuildInformationService implements BuildInformationService {
                             BuildWithDetails buildWithDetails = build.details();
                             switch (buildWithDetails.getResult()) {
                                 case SUCCESS:
-                                    buildInformation.setJobStatus(JobStatus.GREEN);
+                                    buildInformation.setJobStatus(JobStatus.SUCCESS);
                                     break;
                                 case FAILURE:
-                                    buildInformation.setJobStatus(JobStatus.RED);
+                                    buildInformation.setJobStatus(JobStatus.FAILED);
                                     break;
                                 case UNSTABLE:
-                                    buildInformation.setJobStatus(JobStatus.YELLOW);
+                                case CANCELLED:
+                                case ABORTED:
+                                    buildInformation.setJobStatus(JobStatus.WARNING);
                                     break;
+                                case BUILDING:
+                                case REBUILDING:
+                                    buildInformation.setJobStatus(JobStatus.IN_PROGRESS);
+                                    break;
+                                case UNKNOWN:
+                                case NOT_BUILT:
                                 default:
-                                    buildInformation.setJobStatus(JobStatus.BLACK);
+                                    buildInformation.setJobStatus(JobStatus.NO_INFORMATION);
                                     break;
                             }
                         } else {
@@ -74,6 +81,8 @@ public class JenkinsBuildInformationService implements BuildInformationService {
                         }
                         buildInformationList.add(buildInformation);
                     }
+                } catch (NullPointerException exc) {
+                    LOGGER.warn("No build information");
                 } catch (IOException e) {
                     LOGGER.error("Can't get build for range [{}, ...]", nextBuildNumber - 1, e);
                     throw new RuntimeException(e);

@@ -7,17 +7,21 @@ public enum JobStatus {
     /**
      * Job was failed.
      */
-    RED,
+    FAILED,
     /**
      * Job was unstable.
      */
-    YELLOW,
+    WARNING,
     /**
      * No information about build.
      */
-    BLACK,
+    NO_INFORMATION,
     /**
      * Job was successfully built.
      */
-    GREEN
+    SUCCESS,
+    /**
+     * Build is in progress
+     */
+    IN_PROGRESS
 }
